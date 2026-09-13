@@ -2,11 +2,11 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>互動 Reels Demo · build 2026-09-13-0908</title>
+  <title>互動 Reels Demo · build 2026-09-13-0925</title>
   <style>
     :root {
       --bg: #08090d;
@@ -23,12 +23,21 @@
     }
 
     * { box-sizing: border-box; }
+    html {
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
       min-height: var(--app-height);
       color: var(--text);
       background: radial-gradient(circle at 50% 0%, #27212d 0, #111118 32%, var(--bg) 72%);
       overflow-x: hidden;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
     }
 
     body.playing {
@@ -151,6 +160,12 @@
       gap: 10px;
       color: var(--muted);
       font-size: 13px;
+      transition: opacity 160ms ease;
+    }
+
+    .player-shell.predicting .topbar {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .topbar button,
@@ -356,6 +371,32 @@
       border: 0;
       background: transparent;
       color: transparent;
+      touch-action: manipulation;
+    }
+
+    .player-shell.predicting .tap-layer {
+      pointer-events: none;
+    }
+
+    .tap-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 122px;
+      z-index: 3;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: rgba(255, 255, 255, 0.76);
+      background: rgba(0, 0, 0, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      font-size: 12px;
+      transition: opacity 160ms ease;
+    }
+
+    .tap-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .prediction-layer {
@@ -363,10 +404,18 @@
       left: 16px;
       right: 16px;
       bottom: 18px;
-      height: 38%;
+      height: 34%;
       display: none;
       align-items: stretch;
       z-index: 5;
+    }
+
+    .prediction-layer.three-options {
+      height: 40%;
+    }
+
+    .prediction-layer.two-options {
+      height: 34%;
     }
 
     .prediction-layer.show { display: flex; }
@@ -381,7 +430,14 @@
       padding: 13px;
       display: grid;
       gap: 10px;
-      overflow: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .prediction-layer.three-options .bubble {
+      padding: 10px;
+      gap: 6px;
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     }
 
     .bubble.ff {
@@ -404,9 +460,19 @@
       font-weight: 760;
     }
 
+    .prediction-layer.three-options .question {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
     .options {
       display: grid;
       gap: 7px;
+      min-height: 0;
+    }
+
+    .prediction-layer.three-options .options {
+      gap: 5px;
     }
 
     .option {
@@ -420,6 +486,13 @@
       gap: 8px;
       align-items: center;
       min-height: 36px;
+    }
+
+    .prediction-layer.three-options .option {
+      min-height: 30px;
+      padding: 6px 9px;
+      border-radius: 10px;
+      font-size: 14px;
     }
 
     .option.selected {
@@ -442,6 +515,11 @@
       color: rgba(255, 255, 255, 0.72);
     }
 
+    .prediction-layer.three-options .bet-row {
+      gap: 7px;
+      font-size: 11px;
+    }
+
     .bet-row input { width: 100%; accent-color: var(--gold); }
 
     .primary {
@@ -451,6 +529,11 @@
       color: #17110a;
       font-weight: 800;
       padding: 10px 12px;
+    }
+
+    .prediction-layer.three-options .primary {
+      padding: 8px 10px;
+      min-height: 34px;
     }
 
     .primary:disabled {
@@ -553,6 +636,34 @@
 
     .hidden-screen { display: none; }
 
+    .orientation-lock {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      display: none;
+      place-items: center;
+      padding: 28px;
+      color: var(--text);
+      background: #08090d;
+      text-align: center;
+    }
+
+    .orientation-lock-card {
+      max-width: 360px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.08);
+      line-height: 1.7;
+    }
+
+    .orientation-lock-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gold);
+      font-size: 20px;
+    }
+
     @media (max-width: 760px) {
       body { overflow: auto; }
       .app {
@@ -614,11 +725,15 @@
         left: 12px;
         right: 12px;
         bottom: 12px;
-        height: 39%;
+        height: 33%;
+      }
+
+      .prediction-layer.three-options {
+        height: 40%;
       }
       .bubble {
         padding: 11px;
-        gap: 8px;
+        gap: 7px;
       }
       .option {
         min-height: 32px;
@@ -630,13 +745,19 @@
       .version-grid { grid-template-columns: 1fr; }
       .version-card { min-height: 96px; }
     }
+
+    @media (orientation: landscape) {
+      body.playing .orientation-lock {
+        display: grid;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="app">
     <section class="home" id="home">
       <div>
-        <div class="selector-kicker">入口修正版 · build 2026-09-13-0908</div>
+        <div class="selector-kicker">入口修正版 · build 2026-09-13-0925</div>
         <h1>選擇體驗版本</h1>
         <p>請先點選下方任一版本開始。每句字幕對應一張直式單幕；目前使用佔位畫面，不產圖。</p>
       </div>
@@ -676,6 +797,7 @@
         </div>
         <div class="scene-visual-note" id="visualNote"></div>
         <button class="tap-layer" type="button" id="tapLayer">下一幕</button>
+        <div class="tap-hint" id="tapHint">點擊畫面繼續</div>
         <div class="subtitle" id="subtitle">
           <div class="speaker" id="speaker"></div>
           <div class="line" id="line"></div>
@@ -688,6 +810,13 @@
       </div>
     </section>
   </main>
+
+  <div class="orientation-lock" aria-hidden="true">
+    <div class="orientation-lock-card">
+      <strong>請轉回直向觀看</strong>
+      這個 demo 是直式 Reels 體驗，橫向會影響字幕與預測操作。
+    </div>
+  </div>
 
   <audio id="bgm" loop preload="auto"></audio>
 
@@ -845,6 +974,7 @@
     const sceneId = document.getElementById("sceneId");
     const bgmLabel = document.getElementById("bgmLabel");
     const visualNote = document.getElementById("visualNote");
+    const tapHint = document.getElementById("tapHint");
     const subtitle = document.getElementById("subtitle");
     const speaker = document.getElementById("speaker");
     const line = document.getElementById("line");
@@ -855,7 +985,14 @@
     const bgm = document.getElementById("bgm");
 
     function setAppHeight() {
-      document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
+      const height = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--app-height", `${height}px`);
+    }
+
+    function lockPortrait() {
+      if (screen.orientation?.lock) {
+        screen.orientation.lock("portrait").catch(() => {});
+      }
     }
 
     function ensureAudioContext() {
@@ -948,6 +1085,7 @@
 
     function startVersion(key) {
       setAppHeight();
+      lockPortrait();
       playClickSound("success");
       ensureAudioContext();
       currentKey = key;
@@ -957,6 +1095,7 @@
       bet = 100;
       revealedPredictions = new Set();
       document.body.classList.add("playing");
+      player.classList.remove("predicting");
       home.classList.add("hidden-screen");
       player.classList.remove("hidden-screen");
       soundBtn.textContent = soundEnabled ? "音樂：開" : "音樂：關";
@@ -976,13 +1115,18 @@
       routeLabel.textContent = version.title;
       sceneCounter.textContent = `${currentIndex + 1}/${version.scenes.length}`;
       subtitle.classList.remove("hidden");
-      predictionLayer.classList.remove("show");
+      tapHint.classList.remove("hidden");
+      player.classList.remove("predicting");
+      predictionLayer.className = "prediction-layer";
       predictionLayer.innerHTML = "";
     }
 
     function showEndScreen() {
       const version = versions[currentKey];
       subtitle.classList.add("hidden");
+      tapHint.classList.add("hidden");
+      player.classList.add("predicting");
+      predictionLayer.className = `prediction-layer ${prediction.options.length >= 3 ? "three-options" : "two-options"}`;
       predictionLayer.innerHTML = `
         <div class="bubble end-card ${version.uiTone === "ff" ? "ff" : ""}">
           <h2 class="event-title">這版體驗結束</h2>
@@ -998,6 +1142,7 @@
         playClickSound("success");
         currentIndex = 0;
         revealedPredictions = new Set();
+        player.classList.remove("predicting");
         renderScene();
       });
       predictionLayer.querySelector("#otherVersionBtn").addEventListener("click", () => {
@@ -1022,6 +1167,8 @@
       selectedOption = null;
       bet = 100;
       subtitle.classList.add("hidden");
+      tapHint.classList.add("hidden");
+      player.classList.add("predicting");
       predictionLayer.innerHTML = `
         <div class="bubble ${version.uiTone === "ff" ? "ff" : ""}">
           <div class="balance-row">
@@ -1079,6 +1226,7 @@
       const settlement = buildSettlement(prediction, selectedOption);
       balance = settlement.newBalance;
       revealedPredictions.add(sceneObj(version.scenes[currentIndex]).id);
+      predictionLayer.className = "prediction-layer show";
       predictionLayer.innerHTML = `
         <div class="bubble result-card ${settlement.eventClass}">
           <h2 class="event-title">${settlement.title}</h2>
@@ -1100,6 +1248,7 @@
       `;
       predictionLayer.querySelector("#continueBtn").addEventListener("click", () => {
         playClickSound("success");
+        player.classList.remove("predicting");
         nextScene();
       });
     }
@@ -1201,12 +1350,17 @@
       playClickSound("back");
       stopBgm();
       document.body.classList.remove("playing");
+      player.classList.remove("predicting");
       player.classList.add("hidden-screen");
       home.classList.remove("hidden-screen");
     });
     setAppHeight();
     window.addEventListener("resize", setAppHeight);
+    window.visualViewport?.addEventListener("resize", setAppHeight);
     window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 120));
+    document.addEventListener("gesturestart", event => event.preventDefault(), { passive: false });
+    document.addEventListener("gesturechange", event => event.preventDefault(), { passive: false });
+    document.addEventListener("dblclick", event => event.preventDefault(), { passive: false });
   </script>
 </body>
 </html>
