@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>互動 Reels Demo · build 2026-09-13-0925</title>
+  <title>互動 Reels Demo · build 2026-09-13-0942</title>
   <style>
     :root {
       --bg: #08090d;
@@ -206,6 +206,21 @@
         var(--scene-gradient, linear-gradient(145deg, #27272f, #0b0c10));
     }
 
+    .scene-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: none;
+      background: #111;
+    }
+
+    .scene-image.show {
+      display: block;
+    }
+
     .scene-vignette {
       position: absolute;
       inset: 0;
@@ -273,6 +288,10 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 18px 48px rgba(0,0,0,0.24);
       overflow: hidden;
+    }
+
+    .scene-visual-note.hidden {
+      display: none;
     }
 
     .scene-visual-note::before {
@@ -411,7 +430,7 @@
     }
 
     .prediction-layer.three-options {
-      height: 40%;
+      height: 38%;
     }
 
     .prediction-layer.two-options {
@@ -435,9 +454,10 @@
     }
 
     .prediction-layer.three-options .bubble {
-      padding: 10px;
+      padding: 11px;
       gap: 6px;
-      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+      grid-template-rows: auto auto auto auto auto;
+      overflow: hidden;
     }
 
     .bubble.ff {
@@ -472,7 +492,8 @@
     }
 
     .prediction-layer.three-options .options {
-      gap: 5px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
     }
 
     .option {
@@ -489,10 +510,18 @@
     }
 
     .prediction-layer.three-options .option {
-      min-height: 30px;
-      padding: 6px 9px;
+      min-height: 52px;
+      padding: 7px 6px;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 13px;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 3px;
+    }
+
+    .prediction-layer.three-options .option span:first-child {
+      white-space: nowrap;
     }
 
     .option.selected {
@@ -504,6 +533,10 @@
       color: rgba(255, 255, 255, 0.72);
       font-size: 12px;
       white-space: nowrap;
+    }
+
+    .prediction-layer.three-options .odds {
+      font-size: 11px;
     }
 
     .bet-row {
@@ -729,7 +762,7 @@
       }
 
       .prediction-layer.three-options {
-        height: 40%;
+        height: 38%;
       }
       .bubble {
         padding: 11px;
@@ -757,7 +790,7 @@
   <main class="app">
     <section class="home" id="home">
       <div>
-        <div class="selector-kicker">入口修正版 · build 2026-09-13-0925</div>
+        <div class="selector-kicker">入口修正版 · build 2026-09-13-0942</div>
         <h1>選擇體驗版本</h1>
         <p>請先點選下方任一版本開始。每句字幕對應一張直式單幕；目前使用佔位畫面，不產圖。</p>
       </div>
@@ -790,6 +823,7 @@
       </div>
       <div class="phone" id="phone">
         <div class="scene-bg" id="sceneBg"></div>
+        <img class="scene-image" id="sceneImage" alt="">
         <div class="scene-vignette"></div>
         <div class="scene-meta">
           <span id="sceneId"></span>
@@ -971,6 +1005,7 @@
     const player = document.getElementById("player");
     const versionGrid = document.getElementById("versionGrid");
     const sceneBg = document.getElementById("sceneBg");
+    const sceneImage = document.getElementById("sceneImage");
     const sceneId = document.getElementById("sceneId");
     const bgmLabel = document.getElementById("bgmLabel");
     const visualNote = document.getElementById("visualNote");
@@ -1040,7 +1075,7 @@
     }
 
     function sceneObj(raw) {
-      return { id: raw[0], speaker: raw[1], text: raw[2], visual: raw[3] };
+      return { id: raw[0], speaker: raw[1], text: raw[2], visual: raw[3], image: raw[4] || "" };
     }
 
     function escapeHTML(value) {
@@ -1109,11 +1144,24 @@
       sceneBg.style.setProperty("--scene-gradient", version.gradient);
       sceneId.textContent = scene.id;
       bgmLabel.textContent = version.bgmName;
-      visualNote.innerHTML = renderVisualCard(currentKey, scene);
+      if (scene.image) {
+        sceneImage.src = scene.image;
+        sceneImage.alt = `${version.title} ${scene.id}`;
+        sceneImage.classList.add("show");
+        visualNote.classList.add("hidden");
+        visualNote.innerHTML = "";
+      } else {
+        sceneImage.removeAttribute("src");
+        sceneImage.alt = "";
+        sceneImage.classList.remove("show");
+        visualNote.classList.remove("hidden");
+        visualNote.innerHTML = renderVisualCard(currentKey, scene);
+      }
       speaker.textContent = `${scene.speaker}：`;
       line.textContent = scene.text;
       routeLabel.textContent = version.title;
       sceneCounter.textContent = `${currentIndex + 1}/${version.scenes.length}`;
+      tapHint.textContent = currentIndex === version.scenes.length - 1 ? "點擊查看結束選項" : "點擊畫面繼續";
       subtitle.classList.remove("hidden");
       tapHint.classList.remove("hidden");
       player.classList.remove("predicting");
@@ -1126,7 +1174,7 @@
       subtitle.classList.add("hidden");
       tapHint.classList.add("hidden");
       player.classList.add("predicting");
-      predictionLayer.className = `prediction-layer ${prediction.options.length >= 3 ? "three-options" : "two-options"}`;
+      predictionLayer.className = "prediction-layer show two-options";
       predictionLayer.innerHTML = `
         <div class="bubble end-card ${version.uiTone === "ff" ? "ff" : ""}">
           <h2 class="event-title">這版體驗結束</h2>
