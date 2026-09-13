@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>互動 Reels Demo · build 2026-09-13-0942</title>
+  <title>互動 Reels Demo · build 2026-09-13-1018</title>
   <style>
     :root {
       --bg: #08090d;
@@ -169,7 +169,7 @@
     }
 
     .topbar button,
-    .sound-pill {
+    .sound-fab {
       border: 1px solid var(--line);
       border-radius: 999px;
       color: var(--text);
@@ -178,12 +178,43 @@
       white-space: nowrap;
     }
 
-    .sound-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: rgba(255, 255, 255, 0.74);
-      font-size: 12px;
+    .sound-fab {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 8;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: rgba(255, 242, 197, 0.92);
+      background: rgba(10, 10, 14, 0.34);
+      border-color: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .sound-fab.sound-off {
+      color: rgba(255, 255, 255, 0.52);
+      background: rgba(10, 10, 14, 0.24);
+    }
+
+    .sound-fab .sound-icon {
+      transform: translateY(-1px);
+    }
+
+    .sound-fab.sound-off .sound-icon::after {
+      content: "";
+      position: absolute;
+      width: 19px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      transform: translate(-14px, 9px) rotate(-42deg);
+      transform-origin: center;
     }
 
     .phone {
@@ -420,64 +451,114 @@
 
     .prediction-layer {
       position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 18px;
-      height: 34%;
+      inset: 0;
+      padding: 18px 18px 28px;
+      height: auto;
       display: none;
-      align-items: stretch;
+      align-items: end;
       z-index: 5;
+      background: linear-gradient(180deg, rgba(0,0,0,0.02) 28%, rgba(0,0,0,0.34));
+      opacity: 0;
+      transition: opacity 180ms ease;
     }
 
     .prediction-layer.three-options {
-      height: 38%;
+      height: auto;
     }
 
     .prediction-layer.two-options {
-      height: 34%;
+      height: auto;
     }
 
-    .prediction-layer.show { display: flex; }
+    .prediction-layer.show {
+      display: flex;
+      opacity: 1;
+    }
 
     .bubble {
+      position: relative;
       width: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(12, 13, 18, 0.72);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(22px);
-      padding: 13px;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding: 0;
       display: grid;
-      gap: 10px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      gap: 14px;
+      overflow: visible;
+      max-height: none;
+      animation: panelIn 180ms ease both;
+      text-align: center;
+      z-index: 0;
     }
 
     .prediction-layer.three-options .bubble {
-      padding: 11px;
-      gap: 6px;
-      grid-template-rows: auto auto auto auto auto;
-      overflow: hidden;
+      padding: 0;
+      gap: 10px;
+      grid-template-rows: auto auto auto;
+      overflow: visible;
+      max-height: none;
+    }
+
+    @keyframes panelIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .bubble.ff {
-      background: rgba(242, 244, 247, 0.18);
-      border-color: rgba(255, 255, 255, 0.28);
+      background: transparent;
+      border-color: transparent;
     }
 
     .balance-row {
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       gap: 10px;
-      color: rgba(255, 255, 255, 0.74);
+      color: rgba(255, 255, 255, 0.78);
       font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: rgba(8, 8, 12, 0.34);
+      backdrop-filter: blur(12px);
+    }
+
+    .prediction-title {
+      display: grid;
+      gap: 6px;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
+    }
+
+    .prediction-title::before,
+    .result-title::before {
+      content: "";
+      width: 19px;
+      height: 19px;
+      margin: 0 auto -1px;
+      border: 1px solid rgba(255, 239, 203, 0.9);
+      border-radius: 50%;
+      box-shadow: -5px 0 0 -3px rgba(255, 239, 203, 0.9);
+      opacity: 0.95;
+    }
+
+    .prediction-title strong {
+      color: #fff2c5;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 30px;
+      letter-spacing: 0.16em;
+      font-weight: 500;
     }
 
     .question {
       margin: 0;
       font-size: 15px;
       line-height: 1.35;
-      font-weight: 760;
+      font-weight: 600;
+      color: rgba(255,255,255,0.92);
     }
 
     .prediction-layer.three-options .question {
@@ -487,37 +568,40 @@
 
     .options {
       display: grid;
-      gap: 7px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
       min-height: 0;
     }
 
     .prediction-layer.three-options .options {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
+      grid-template-columns: 1fr;
+      gap: 8px;
     }
 
     .option {
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 14px;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.08);
-      padding: 9px 10px;
+      background: rgba(12, 13, 18, 0.30);
+      backdrop-filter: blur(12px);
+      padding: 12px 12px;
       display: flex;
       justify-content: space-between;
       gap: 8px;
       align-items: center;
-      min-height: 36px;
+      min-height: 48px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
     }
 
     .prediction-layer.three-options .option {
-      min-height: 52px;
-      padding: 7px 6px;
-      border-radius: 10px;
-      font-size: 13px;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-      gap: 3px;
+      min-height: 39px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+      gap: 6px;
     }
 
     .prediction-layer.three-options .option span:first-child {
@@ -526,7 +610,8 @@
 
     .option.selected {
       border-color: rgba(245, 210, 119, 0.76);
-      background: rgba(245, 210, 119, 0.16);
+      background: rgba(245, 210, 119, 0.18);
+      box-shadow: 0 0 24px rgba(245, 210, 119, 0.18);
     }
 
     .odds {
@@ -541,19 +626,44 @@
 
     .bet-row {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto repeat(4, minmax(0, 1fr)) minmax(118px, 1.35fr);
       align-items: center;
-      gap: 9px;
+      gap: 7px;
       font-size: 12px;
       color: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 13px;
+      padding: 8px;
+      background: rgba(8, 8, 12, 0.34);
+      backdrop-filter: blur(12px);
     }
 
     .prediction-layer.three-options .bet-row {
-      gap: 7px;
       font-size: 11px;
     }
 
-    .bet-row input { width: 100%; accent-color: var(--gold); }
+    .bet-choice {
+      min-height: 31px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 9px;
+      color: rgba(255,255,255,0.86);
+      background: rgba(255,255,255,0.06);
+      padding: 6px 4px;
+      font-size: 12px;
+    }
+
+    .bet-choice.selected {
+      border-color: rgba(245, 210, 119, 0.72);
+      color: #17110a;
+      background: linear-gradient(135deg, #f0d27c, #fff1bd);
+    }
+
+    .potential {
+      color: rgba(255,255,255,0.68);
+      font-size: 11px;
+      white-space: nowrap;
+      text-align: right;
+    }
 
     .primary {
       border: 0;
@@ -574,69 +684,205 @@
       cursor: default;
     }
 
+    .result-layer {
+      padding: 0 26px 30px;
+      align-items: stretch;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.00) 18%, rgba(0,0,0,0.08) 46%, rgba(0,0,0,0.54) 100%);
+    }
+
     .result-card {
-      gap: 8px;
-      justify-content: center;
+      min-height: 100%;
+      width: 100%;
+      align-content: end;
+      gap: 9px;
+      padding: 0 0 4px;
+      justify-content: stretch;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 2px 18px rgba(0,0,0,0.78);
+    }
+
+    .result-title {
+      display: grid;
+      gap: 5px;
+      margin-bottom: 4px;
+    }
+
+    .result-title h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      letter-spacing: 0.18em;
+      font-weight: 500;
+      filter: drop-shadow(0 0 14px currentColor);
+    }
+
+    .result-title p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.35;
+      letter-spacing: 0.08em;
+    }
+
+    .score-art {
+      position: relative;
+      width: min(360px, 100%);
+      margin: 0 auto;
+      padding: 5px 0 4px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-art::before,
+    .score-art::after {
+      content: "";
+      height: 1px;
+      background: currentColor;
+      opacity: 0.45;
+    }
+
+    .score-word {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 36px;
+      line-height: 1;
+      font-style: italic;
+      font-weight: 500;
+      white-space: nowrap;
+      filter: drop-shadow(0 0 18px currentColor);
+    }
+
+    .score-word small {
+      display: block;
+      margin-top: 3px;
+      font-family: inherit;
+      font-size: 12px;
+      font-style: normal;
+      letter-spacing: 0.26em;
+      opacity: 0.88;
     }
 
     .event-title {
       margin: 0;
-      font-size: 20px;
+      font-size: 15px;
       line-height: 1.2;
       font-weight: 860;
+      letter-spacing: 0.05em;
     }
 
     .event-copy {
       margin: 0;
       color: rgba(255, 255, 255, 0.78);
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.45;
-    }
-
-    .event-bonus {
-      border-color: rgba(255, 232, 153, 0.55);
-      box-shadow: 0 20px 70px rgba(245, 210, 119, 0.20), 0 0 0 1px rgba(245, 210, 119, 0.12) inset;
-    }
-
-    .event-tie-win {
-      border-color: rgba(255, 239, 255, 0.62);
-      box-shadow: 0 22px 80px rgba(255, 210, 251, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
-    }
-
-    .event-tie-near {
-      border-color: rgba(207, 230, 255, 0.48);
-      box-shadow: 0 18px 66px rgba(120, 174, 235, 0.13);
+      letter-spacing: 0.04em;
     }
 
     .settlement {
+      width: min(360px, 100%);
+      margin: 0 auto;
       display: grid;
-      gap: 7px;
-      margin-top: 2px;
+      gap: 0;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+      color: inherit;
+      opacity: 0.96;
     }
 
     .settle-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-radius: 12px;
       padding: 8px 10px;
-      background: rgba(255, 255, 255, 0.08);
-      font-size: 13px;
+      background: transparent;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      letter-spacing: 0.09em;
     }
+
+    .settle-row:last-child { border-bottom: 0; }
 
     .settle-row .amount {
       font-weight: 850;
-      font-size: 15px;
+      font-size: 19px;
+      font-family: Georgia, "Times New Roman", serif;
+      letter-spacing: 0.02em;
     }
 
-    .gain .amount { color: var(--gain); text-shadow: 0 0 16px rgba(245, 210, 119, 0.35); }
-    .refund .amount { color: var(--soft); }
-    .down .amount { color: var(--down); }
-    .extra {
-      border: 1px solid rgba(255, 239, 255, 0.34);
-      background: linear-gradient(135deg, rgba(255, 239, 255, 0.18), rgba(245, 210, 119, 0.10));
+    .gain .amount,
+    .refund .amount,
+    .extra .amount {
+      text-shadow: 0 0 16px currentColor;
     }
-    .extra .amount { color: var(--extra); text-shadow: 0 0 18px rgba(255, 239, 255, 0.42); }
+
+    .result-miss { color: #cfd1d8; }
+    .result-great { color: #baf6c8; }
+    .result-near { color: #bfe3ff; }
+    .result-perfect { color: #f3c5ff; }
+    .result-bonus { color: #fff0a8; }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -24px;
+      height: 50%;
+      z-index: -1;
+      opacity: 0.34;
+      background: radial-gradient(circle at 50% 30%, currentColor, transparent 62%);
+      filter: blur(24px);
+    }
+
+    .result-card::after {
+      content: "✦";
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      color: currentColor;
+      font-size: 11px;
+      opacity: 0.65;
+      text-shadow:
+        -132px 0 0 currentColor,
+        132px 0 0 currentColor,
+        -148px -126px 0 currentColor,
+        146px -116px 0 currentColor;
+    }
+
+    .result-bonus .score-art {
+      color: #ffe58e;
+      animation: bonusGlow 1.4s ease-in-out infinite alternate;
+    }
+
+    .result-bonus {
+      background:
+        radial-gradient(circle at 18% 22%, rgba(123, 226, 255, 0.22), transparent 22%),
+        radial-gradient(circle at 78% 18%, rgba(255, 155, 220, 0.18), transparent 24%),
+        radial-gradient(circle at 50% 90%, rgba(255, 229, 142, 0.16), transparent 30%);
+      border-radius: 18px;
+      padding: 6px 0 0;
+    }
+
+    .result-layer .primary {
+      width: min(360px, 100%);
+      margin: 0 auto;
+      border: 0;
+      border-radius: 0;
+      color: rgba(255,255,255,0.70);
+      background: transparent;
+      padding: 6px 0 0;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+    }
+
+    @keyframes bonusGlow {
+      from { filter: drop-shadow(0 0 8px rgba(255,226,132,0.34)); }
+      to { filter: drop-shadow(0 0 18px rgba(255,151,218,0.44)); }
+    }
 
     .end-card {
       text-align: center;
@@ -732,8 +978,7 @@
         font-size: 12px;
         gap: 6px;
       }
-      .topbar button,
-      .sound-pill {
+      .topbar button {
         padding: 7px 9px;
       }
       .phone {
@@ -755,22 +1000,36 @@
         font-size: 16px;
       }
       .prediction-layer {
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
-        height: 33%;
+        padding: 12px 12px 20px;
       }
 
       .prediction-layer.three-options {
-        height: 38%;
+        height: auto;
       }
       .bubble {
-        padding: 11px;
-        gap: 7px;
+        gap: 9px;
       }
       .option {
-        min-height: 32px;
+        min-height: 34px;
         padding: 7px 9px;
+      }
+      .prediction-title strong {
+        font-size: 23px;
+      }
+      .result-title h2 {
+        font-size: 26px;
+      }
+      .score-word {
+        font-size: 28px;
+      }
+      .bet-row {
+        grid-template-columns: auto repeat(4, minmax(34px, 1fr));
+      }
+      .bet-row .primary {
+        grid-column: 1 / -1;
+      }
+      .potential {
+        display: none;
       }
     }
 
@@ -790,7 +1049,7 @@
   <main class="app">
     <section class="home" id="home">
       <div>
-        <div class="selector-kicker">入口修正版 · build 2026-09-13-0942</div>
+        <div class="selector-kicker">結果風格修正版 · build 2026-09-13-result-style-v2</div>
         <h1>選擇體驗版本</h1>
         <p>請先點選下方任一版本開始。每句字幕對應一張直式單幕；目前使用佔位畫面，不產圖。</p>
       </div>
@@ -818,7 +1077,6 @@
       <div class="topbar">
         <button type="button" id="backBtn">返回首頁</button>
         <span id="routeLabel"></span>
-        <button class="sound-pill" type="button" id="soundBtn">音樂：開</button>
         <span id="sceneCounter"></span>
       </div>
       <div class="phone" id="phone">
@@ -829,6 +1087,9 @@
           <span id="sceneId"></span>
           <span id="bgmLabel"></span>
         </div>
+        <button class="sound-fab" type="button" id="soundBtn" aria-label="關閉音樂與音效" aria-pressed="true">
+          <span class="sound-icon" aria-hidden="true">♪</span>
+        </button>
         <div class="scene-visual-note" id="visualNote"></div>
         <button class="tap-layer" type="button" id="tapLayer">下一幕</button>
         <div class="tap-hint" id="tapHint">點擊畫面繼續</div>
@@ -1056,12 +1317,20 @@
       osc.stop(now + 0.13);
     }
 
+    function updateSoundButton() {
+      soundBtn.classList.toggle("sound-off", !soundEnabled);
+      soundBtn.setAttribute("aria-pressed", String(soundEnabled));
+      soundBtn.setAttribute("aria-label", soundEnabled ? "關閉音樂與音效" : "開啟音樂與音效");
+      const icon = soundBtn.querySelector(".sound-icon");
+      if (icon) icon.textContent = soundEnabled ? "♪" : "♪";
+    }
+
     function playBgmFor(key) {
       bgm.src = AUDIO_SOURCES[key] || versions[key].bgm;
       bgm.volume = 0.42;
       if (!soundEnabled) return;
       bgm.play().catch(() => {
-        soundBtn.textContent = "點一下開音樂";
+        soundBtn.setAttribute("aria-label", "點一下開啟音樂與音效");
       });
     }
 
@@ -1133,7 +1402,7 @@
       player.classList.remove("predicting");
       home.classList.add("hidden-screen");
       player.classList.remove("hidden-screen");
-      soundBtn.textContent = soundEnabled ? "音樂：開" : "音樂：關";
+      updateSoundButton();
       playBgmFor(key);
       renderScene();
     }
@@ -1217,13 +1486,17 @@
       subtitle.classList.add("hidden");
       tapHint.classList.add("hidden");
       player.classList.add("predicting");
+      predictionLayer.className = `prediction-layer ${prediction.options.length >= 3 ? "three-options" : "two-options"}`;
       predictionLayer.innerHTML = `
         <div class="bubble ${version.uiTone === "ff" ? "ff" : ""}">
           <div class="balance-row">
             <span>帳戶餘額：${formatMoney(balance)}</span>
             <span>${prediction.type === "yesNo" ? "是非題" : "選擇題"}</span>
           </div>
-          <p class="question">${prediction.question}</p>
+          <div class="prediction-title">
+            <strong>關鍵預測</strong>
+            <p class="question">${prediction.question}</p>
+          </div>
           <div class="options">
             ${prediction.options.map(option => `
               <button type="button" class="option" data-option="${option.id}">
@@ -1233,11 +1506,13 @@
             `).join("")}
           </div>
           <div class="bet-row">
-            <span>投入 ${formatMoney(bet)}</span>
-            <input id="betInput" type="range" min="50" max="300" step="50" value="${bet}">
-            <span id="potential">可得 --</span>
+            <span>投入</span>
+            ${[50, 100, 200, 500].map(amount => `
+              <button type="button" class="bet-choice ${amount === bet ? "selected" : ""}" data-bet="${amount}">${amount}</button>
+            `).join("")}
+            <span class="potential" id="potential">可得 --</span>
+            <button class="primary" id="confirmBtn" type="button" disabled>確認預測</button>
           </div>
-          <button class="primary" id="confirmBtn" type="button" disabled>確認預測</button>
         </div>
       `;
       predictionLayer.classList.add("show");
@@ -1251,11 +1526,14 @@
           updatePotential();
         });
       });
-      predictionLayer.querySelector("#betInput").addEventListener("input", event => {
-        playClickSound();
-        bet = Number(event.target.value);
-        predictionLayer.querySelector(".bet-row span").textContent = `投入 ${formatMoney(bet)}`;
-        updatePotential();
+      predictionLayer.querySelectorAll(".bet-choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          playClickSound();
+          bet = Number(btn.dataset.bet);
+          predictionLayer.querySelectorAll(".bet-choice").forEach(item => item.classList.remove("selected"));
+          btn.classList.add("selected");
+          updatePotential();
+        });
       });
       predictionLayer.querySelector("#confirmBtn").addEventListener("click", () => {
         playClickSound("success");
@@ -1274,10 +1552,17 @@
       const settlement = buildSettlement(prediction, selectedOption);
       balance = settlement.newBalance;
       revealedPredictions.add(sceneObj(version.scenes[currentIndex]).id);
-      predictionLayer.className = "prediction-layer show";
+      predictionLayer.className = "prediction-layer show result-layer";
       predictionLayer.innerHTML = `
-        <div class="bubble result-card ${settlement.eventClass}">
-          <h2 class="event-title">${settlement.title}</h2>
+        <div class="bubble result-card ${settlement.toneClass}">
+          <div class="result-title">
+            <h2>預測結果</h2>
+            <p>${settlement.lead}</p>
+          </div>
+          <div class="score-art">
+            <span class="score-word">${settlement.score}<small>${settlement.scoreLabel}</small></span>
+          </div>
+          <h3 class="event-title">${settlement.title}</h3>
           <p class="event-copy">${settlement.copy}</p>
           <div class="settlement">
             ${settlement.parts.map(part => `
@@ -1287,7 +1572,7 @@
               </div>
             `).join("")}
             <div class="settle-row">
-              <span>目前餘額</span>
+              <span>餘額：</span>
               <span class="amount">${formatMoney(balance)}</span>
             </div>
           </div>
@@ -1308,49 +1593,64 @@
       if (prediction.mode === "bonus") {
         return {
           newBalance: reserved + payout,
-          eventClass: "event-bonus",
+          toneClass: "result-bonus",
+          score: "Bonus",
+          scoreLabel: "Bonus",
+          lead: "喜從天降，全部選項通通有獎！",
           title: "哇！太幸運了～",
-          copy: "Bonus 來了！這題全部選項通通有獎，剛好被你遇到！",
-          parts: [{ label: "獲得", amount: `+${formatMoney(payout)}`, kind: "gain" }]
+          copy: "這題不用糾結，你剛好踩到最甜的那一下。",
+          parts: [{ label: "獲得：", amount: `+${formatMoney(payout)}`, kind: "gain" }]
         };
       }
       if (prediction.mode === "tie" && option.result === "near") {
         const refund = Math.round(bet * 0.5);
         return {
           newBalance: reserved + refund,
-          eventClass: "event-tie-near",
-          title: "這個有算到～",
-          copy: "你選的不是最後那一下，但前面的反應確實被你抓住了。",
-          parts: [{ label: "返還", amount: `+${formatMoney(refund)}`, kind: "refund" }]
+          toneClass: "result-near",
+          score: "Cool",
+          scoreLabel: "趨近完美",
+          lead: "反應抓得很準，只差最後一點點。",
+          title: "趨近完美",
+          copy: "這個選擇很接近她真正會做的事，保留一半給你繼續追。",
+          parts: [{ label: "獲得：", amount: `退一半 +${formatMoney(refund)}`, kind: "refund" }]
         };
       }
       if (prediction.mode === "tie" && option.result === "tieWin") {
         return {
           newBalance: reserved + payout + extra,
-          eventClass: "event-tie-win",
-          title: "太會猜了吧！",
-          copy: "你簡直像本人一樣懂她，連她下一步怎麼藏都看出來了。",
+          toneClass: "result-perfect",
+          score: "Perfect",
+          scoreLabel: "完美命中",
+          lead: "你直接猜到她最細的心思。",
+          title: "完美命中",
+          copy: "太會猜了吧！你簡直像本人一樣懂她。",
           parts: [
-            { label: "獲得", amount: `+${formatMoney(payout)}`, kind: "gain" },
-            { label: "額外獎勵", amount: `+${formatMoney(extra)}`, kind: "extra" }
+            { label: "獲得：", amount: `+${formatMoney(payout)}`, kind: "gain" },
+            { label: "額外獎勵：", amount: `+${formatMoney(extra)}`, kind: "extra" }
           ]
         };
       }
       if (option.id === prediction.correct) {
         return {
           newBalance: reserved + payout,
-          eventClass: "",
+          toneClass: "result-great",
+          score: "Great",
+          scoreLabel: "命中",
+          lead: "表現不錯，你大致預測到她會這樣做。",
           title: "猜中了！",
           copy: "你真的有看懂她，下一步完全被你看到了。",
-          parts: [{ label: "獲得", amount: `+${formatMoney(payout)}`, kind: "gain" }]
+          parts: [{ label: "獲得：", amount: `+${formatMoney(payout)}`, kind: "gain" }]
         };
       }
       return {
         newBalance: reserved,
-        eventClass: "",
+        toneClass: "result-miss",
+        score: "Miss",
+        scoreLabel: "未命中",
+        lead: "這次她沒有照你想的方向走。",
         title: "故事轉了一下～",
-        copy: "她這次換了個節奏，下一幕會把答案演出來。",
-        parts: [{ label: "本次調整", amount: `-${formatMoney(bet)}`, kind: "down" }]
+        copy: "答案會在下一幕演出來，節奏還可以再抓一次。",
+        parts: [{ label: "獲得：", amount: "0", kind: "down" }]
       };
     }
 
@@ -1385,8 +1685,10 @@
       prevScene();
     });
     soundBtn.addEventListener("click", () => {
+      const wasEnabled = soundEnabled;
+      if (wasEnabled) playClickSound("back");
       soundEnabled = !soundEnabled;
-      soundBtn.textContent = soundEnabled ? "音樂：開" : "音樂：關";
+      updateSoundButton();
       if (soundEnabled) {
         playClickSound("success");
         if (currentKey) playBgmFor(currentKey);
@@ -1403,6 +1705,7 @@
       home.classList.remove("hidden-screen");
     });
     setAppHeight();
+    updateSoundButton();
     window.addEventListener("resize", setAppHeight);
     window.visualViewport?.addEventListener("resize", setAppHeight);
     window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 120));
